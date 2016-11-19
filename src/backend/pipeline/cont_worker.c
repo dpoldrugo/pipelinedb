@@ -283,16 +283,15 @@ should_exec_query(ContQuery *query)
 	if (query->type != CONT_TRANSFORM)
 		return true;
 
+	if (OidIsValid(query->tgfn))
+		return true;
+
 	/*
 	 * If it's a transform with no trigger function and no output stream readers,
 	 * it's a noop
 	 */
 	readers = GetAllStreamReaders(query->osrelid);
-
-	if (!OidIsValid(query->tgfn) && bms_is_empty(readers))
-		return false;
-
-	return true;
+	return bms_is_empty(readers);
 }
 
 void
